@@ -1,60 +1,64 @@
 "use client";
 
-import React, { useState } from "react";
-import { Highlight, themes } from "prism-react-renderer";
+import React from "react";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import { EditorState, LexicalEditor } from "lexical";
+import { CodeHighlightNode, CodeNode } from "@lexical/code";
+import Prism from "prismjs";
+import "prismjs/themes/prism-tomorrow.css"; // Theme
 
-const sampleCode = `function helloWorld() {
-  console.log("Hello, World!");
-}`;
+const highlightCode = () => {
+  document.querySelectorAll("code").forEach((block) => {
+    Prism.highlightElement(block as HTMLElement);
+  });
+};
 
-const CodeBlock = () => {
-  const [code, setCode] = useState(sampleCode);
+const handleEditorChange = (editorState: EditorState, editor: LexicalEditor) => {
+  if(editor) {
+    editorState.read(() => {
+      highlightCode(); // Trigger PrismJS highlight
+    });
+  }
+  
+};
 
-  const handleInput = (event: React.FormEvent<HTMLDivElement>) => {
-    setCode(event.currentTarget.innerText);
+const CodeEditor = () => {
+  const editorConfig = {
+    namespace: "CodeEditor",
+    theme: {
+      paragraph: "text-white",
+      code: "bg-gray-800 text-green-300 px-2 py-1 rounded",
+    },
+    nodes: [CodeHighlightNode, CodeNode],
+    onError: (error: Error) => {
+      console.error(error);
+    },
   };
 
+
   return (
-    <div className="bg-gray-900 text-white rounded-lg shadow-lg overflow-hidden border border-gray-700">
-      {/* Header */}
-      <div className="flex justify-between items-center bg-gray-800 px-4 py-2 text-sm font-bold">
-        <span>JavaScript</span>
-      </div>
+    <LexicalComposer initialConfig={editorConfig}>
+      <div className="bg-gray-900 text-white rounded-lg shadow-lg border border-gray-700 p-4">
+        {/* Header */}
+        <div className="bg-gray-800 px-4 py-2 text-sm font-bold">JavaScript</div>
 
-      {/* Code Container (Line numbers + Highlighted Code) */}
-      <div className="flex flex-row p-4 overflow-auto">
-        {/* Line Number Gutter */}
-        <div className="pr-4 w-10 text-gray-500 text-right select-none">
-          {code.split("\n").map((_, i) => (
-            <div key={i}>{i + 1}</div>
-          ))}
+        {/* Editor */}
+        <div className="p-4 relative bg-white/10">
+          <RichTextPlugin
+            contentEditable={
+              <ContentEditable className="outline-none bg-transparent w-full h-auto min-h-[100px] p-2 text-sm" />
+            }
+            placeholder={<div className="text-gray-500 select-none pointer-events-none text-sm absolute top-6 left-6">Write code here...</div>}
+            ErrorBoundary={() => <div>Error!</div>}
+          />
+          <OnChangePlugin onChange={handleEditorChange} />
         </div>
-
-        {/* Prism Code Block */}
-        <Highlight theme={themes.nightOwl} code={code} language="javascript">
-          {({ className, style, tokens, getLineProps, getTokenProps }) => (
-            <pre className={`${className} flex-1`} style={style}>
-              <div
-                className="outline-none whitespace-pre-wrap break-words"
-                contentEditable
-                suppressContentEditableWarning
-                onInput={handleInput}
-                spellCheck={false}
-              >
-                {tokens.map((line, i) => (
-                  <div key={i} {...getLineProps({ line })}>
-                    {line.map((token, key) => (
-                      <span key={key} {...getTokenProps({ token })} />
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </pre>
-          )}
-        </Highlight>
       </div>
-    </div>
+    </LexicalComposer>
   );
 };
 
-export default CodeBlock;
+export default CodeEditor;
