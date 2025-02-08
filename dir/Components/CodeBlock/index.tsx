@@ -8,10 +8,11 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { EditorState, LexicalEditor } from "lexical";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import Prism from "prismjs";
-import "prismjs/themes/prism-tomorrow.css"; // Theme
+import TreeViewPlugin from "../../plugins/TreeViewPlugin";
+import ForceCodeBlockPlugin from "../../plugins/CodeHighlightPlugin";
 
 const highlightCode = () => {
-  document.querySelectorAll("code").forEach((block) => {
+  document.querySelectorAll("pre code").forEach((block) => {
     Prism.highlightElement(block as HTMLElement);
   });
 };
@@ -41,21 +42,24 @@ const CodeEditor = () => {
 
   return (
     <LexicalComposer initialConfig={editorConfig}>
-      <div className="bg-gray-900 text-white rounded-lg shadow-lg border border-gray-700 p-4">
+      <div className="bg-gray-900 code-editor-container text-white rounded-lg shadow-lg border border-gray-700 p-4">
         {/* Header */}
         <div className="bg-gray-800 px-4 py-2 text-sm font-bold">JavaScript</div>
 
         {/* Editor */}
-        <div className="p-4 relative bg-white/10">
+        <div className="p-4 relative overflow-auto bg-white/10 code-editor-container">
           <RichTextPlugin
             contentEditable={
-              <ContentEditable className="outline-none bg-transparent w-full h-auto min-h-[100px] p-2 text-sm" />
+              <ContentEditable className="outline-none bg-transparent w-full min-h-[100px] p-2 text-sm code-editor-container" />
             }
             placeholder={<div className="text-gray-500 select-none pointer-events-none text-sm absolute top-6 left-6">Write code here...</div>}
             ErrorBoundary={() => <div>Error!</div>}
           />
           <OnChangePlugin onChange={handleEditorChange} />
+          <ForceCodeBlockPlugin />
         </div>
+
+        <TreeViewPlugin/>
       </div>
     </LexicalComposer>
   );

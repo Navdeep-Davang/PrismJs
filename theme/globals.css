@@ -1,3 +1,6 @@
+@import "./prismjs/prism-vs.css";
+@import "./prismjs/prism-vsc-dark-plus.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -18,4 +21,14 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.tree-view-output{
+  overflow-x: auto;
+}
+
+.code-editor-container {
+  overflow-x: auto;
+  white-space: pre;
+  display: block;
 }
