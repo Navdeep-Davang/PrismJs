@@ -1,29 +1,38 @@
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { useState } from "react";
-import CodeBlockPlugin from "@/dir/plugins/CodeBlockPlugin";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import LexicalContentEditable from "../ContentEditable";
-import TreeViewPlugin from "@/dir/plugins/TreeViewPlugin";
+'use client';
 
-export default function CodeEditor(): React.JSX.Element {
-  const [editor] = useLexicalComposerContext();
-  const [activeEditor, setActiveEditor] = useState(editor);
+import { Nodes } from '@/dir/nodes';
+import PrismJsTheme from '@/dir/utils/PrismJsTheme';
+import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical';
+import Editor from './Editor';
+
+function $prepopulatedEditorText() {
+  const root = $getRoot();
+  if (root.getFirstChild() === null) {
+    const paragraph = $createParagraphNode();
+    paragraph.append(
+      $createTextNode('Welcome to the Code Editor! Start typing your code here...')
+    );
+    root.append(paragraph);
+  }
+}
+
+export default function CodeEditor() {
+  const initialConfig = {
+    editorState: $prepopulatedEditorText,
+    namespace: 'CodeEditor',
+    nodes: [...Nodes],
+    theme: PrismJsTheme,
+    onError: (error: Error) => {
+      console.error('CodeEditor Error:', error);
+    },
+  };
 
   return (
-    <div className="w-full">
-      <CodeBlockPlugin activeEditor={activeEditor} setActiveEditor={setActiveEditor} />
-      <RichTextPlugin
-        contentEditable={
-          <div className="editor-scroller">
-            <div className="editor">
-              <LexicalContentEditable placeholder={"Type Here"} />
-            </div>
-          </div>
-        }
-        ErrorBoundary={LexicalErrorBoundary}
-      />
-      <TreeViewPlugin/>
-    </div>
+    <LexicalComposer initialConfig={initialConfig}>
+        <div className="editor-container flex justify-center items-center px-20 py-5">
+          <Editor />
+        </div>
+    </LexicalComposer>
   );
 }
