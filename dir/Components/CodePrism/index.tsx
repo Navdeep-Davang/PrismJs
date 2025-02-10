@@ -5,7 +5,6 @@ import 'prismjs/components/prism-javascript'; // Import specific language compon
 
 const CodePrism: React.FC = () => {
   const [code, setCode] = useState<string>('');
-  const [cursorPosition, setCursorPosition] = useState<number>(0);
   const editableRef = useRef<HTMLDivElement>(null);
 
   const handleChange = (event: React.FormEvent<HTMLDivElement>) => {
@@ -15,72 +14,94 @@ const CodePrism: React.FC = () => {
   };
 
   useEffect(() => {
-    const selection = window.getSelection();
-    const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-    setCursorPosition(range?.endOffset ?? 0);
-  }, [code]);
-
-   useEffect(() => {
-      if (editableRef.current) {
-        editableRef.current.innerHTML = Prism.highlight(code, Prism.languages.javascript, 'javascript');
-      }
-    }, [code]);
-
-  useEffect(() => {
     if (editableRef.current) {
       const selection = window.getSelection();
       const range = document.createRange();
-      const childNode = editableRef.current.childNodes[0];
-      
-      if (childNode && childNode.nodeType === Node.TEXT_NODE) {
-        range.setStart(childNode, Math.min(cursorPosition, childNode.textContent?.length || 0));
-        range.collapse(true);
-        selection?.removeAllRanges();
-        selection?.addRange(range);
+
+      if (selection && selection.rangeCount > 0) {
+        const cursorPos = selection.getRangeAt(0).startOffset || 0;
+        const newCursorPos = Math.min(cursorPos, editableRef.current.textContent?.length || 0);
+
+        editableRef.current.innerHTML = Prism.highlight(code, Prism.languages.javascript, 'javascript');
+        const childNode = editableRef.current.childNodes[0];
+
+        if (childNode && childNode.nodeType === Node.TEXT_NODE) {
+          range.setStart(childNode, newCursorPos);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      } else {
+        editableRef.current.innerHTML = Prism.highlight(code, Prism.languages.javascript, 'javascript');
       }
     }
-  }, [cursorPosition]);
-
+  }, [code]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Tab') {
       event.preventDefault();
-      const element = editableRef.current;
-      if (element) {
-        const selection = window.getSelection();
-        const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-        const cursorPosition = range?.startOffset ?? 0;
+      const selection = window.getSelection();
+      const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+      const cursorPosition = range?.startOffset ?? 0;
 
-        const beforeCursor = code.slice(0, cursorPosition);
-        const afterCursor = code.slice(cursorPosition);
-        const updatedCode = `${beforeCursor}\t${afterCursor}`;
+      const beforeCursor = code.slice(0, cursorPosition);
+      const afterCursor = code.slice(cursorPosition);
+      const updatedCode = `${beforeCursor}\t${afterCursor}`;
 
-        setCode(updatedCode);
-        setTimeout(() => {
-          if (range) {
-            range.setStart(element.childNodes[0], cursorPosition + 1);
-            range.collapse(true);
-            selection?.removeAllRanges();
-            selection?.addRange(range);
-          }
-        }, 0);
-      }
+      setCode(updatedCode);
+      setTimeout(() => {
+        if (range && editableRef.current) {
+          range.setStart(editableRef.current.childNodes[0], cursorPosition + 1);
+          range.collapse(true);
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+        }
+      }, 0);
+    }
+  };
+
+  const handleInput = (event: React.FormEvent<HTMLDivElement>) => {
+    handleChange(event);
+    const selection = window.getSelection();
+    const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+    const nativeEvent = event.nativeEvent as InputEvent;
+
+    if (nativeEvent.inputType === 'insertLineBreak' && range){
+      event.preventDefault();
+      const cursorPosition = range.startOffset;
+      const beforeCursor = code.slice(0, cursorPosition);
+      const afterCursor = code.slice(cursorPosition);
+      const updatedCode = `${beforeCursor}\n${afterCursor}`;
+
+      setCode(updatedCode);
+      setTimeout(() => {
+        if (editableRef.current) {
+          range.setStart(editableRef.current.childNodes[0], cursorPosition + 1);
+          range.collapse(true);
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+        }
+      }, 0);
     }
   };
 
   return (
-    <div>
-      <div
-        ref={editableRef}
-        contentEditable
-        onInput={handleChange}
-        onKeyDown={handleKeyDown}
-        style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
-        suppressContentEditableWarning={true}
-      >
+    <div className='for-viewport flex justify-center'>
+      <div className='w-[600px]'>
+        <div
+          ref={editableRef}
+          contentEditable
+          onInput={handleInput}
+          onKeyDown={handleKeyDown}
+          style={{ whiteSpace: 'pre', fontFamily: 'monospace', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', minWidth: '100%' }}
+          suppressContentEditableWarning={true}
+          className='overflow-x-auto'
+        >
+        </div>
       </div>
     </div>
   );
 };
 
 export default CodePrism;
+
