@@ -1,19 +1,22 @@
 import { Axis3d } from "lucide-react";
-import { useState, ReactNode, useEffect } from "react";
+import { useState, ReactNode, useEffect, useRef } from "react";
 
 interface VerticalAdjustableProps {
   children: ReactNode;
   contentHeight?: number;
 }
 
-export const VerticalAdjustable = ({ children, contentHeight }: VerticalAdjustableProps) => {
-  const DEFAULT_HEIGHT = 300;
+export const VerticalAdjustable = ({ children, contentHeight}: VerticalAdjustableProps) => {
+  const DEFAULT_HEIGHT = 200;
   const DEFAULT_LOWER_LIMIT = 200;
   const DEFAULT_UPPER_LIMIT = 300;
 
   const [isResizing, setIsResizing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [height, setHeight] = useState(DEFAULT_HEIGHT);
+
+  const hiddenInputRef = useRef<HTMLInputElement>(null);
+
 
   const computeLimits = (contentHeight?: number) => {
     if (contentHeight === undefined) {
@@ -33,12 +36,55 @@ export const VerticalAdjustable = ({ children, contentHeight }: VerticalAdjustab
 
   const { lowerLimit, upperLimit } = computeLimits(contentHeight);
 
+
+  
   useEffect(() => {
     if (contentHeight !== undefined) {
       const adjustedHeight = contentHeight + 40;
-      setHeight((prevHeight) => (prevHeight < adjustedHeight ? prevHeight : adjustedHeight));
+
+      setHeight((prevHeight) => {
+
+        if (prevHeight > adjustedHeight && adjustedHeight < DEFAULT_LOWER_LIMIT ) {
+          if (prevHeight <= upperLimit && prevHeight >= lowerLimit) {
+            return prevHeight;
+          } else {
+            return upperLimit;
+          };
+        }
+
+        if (prevHeight < adjustedHeight &&  adjustedHeight >= DEFAULT_LOWER_LIMIT ) {
+          if (prevHeight <= upperLimit && prevHeight >= lowerLimit) {
+            return prevHeight;
+          } else {
+            return lowerLimit;
+          }
+        }
+
+        if (prevHeight < adjustedHeight && prevHeight < lowerLimit) {
+          // If prevHeight is less than adjustedHeight, check new limits
+          return prevHeight;
+        }
+
+
+        return prevHeight;
+      });
     }
-  }, [contentHeight]);
+  }, [contentHeight, lowerLimit, upperLimit]);
+
+
+
+
+  useEffect(() => {
+    if (isResizing) {
+      document.body.style.userSelect = "none"; // Disable text selection
+      hiddenInputRef.current?.focus(); // Blur the Monaco Editor by focusing on hidden input
+    } else {
+      document.body.style.userSelect = ""; // Re-enable text selection
+    }
+  }, [isResizing]);
+
+
+
 
   useEffect(() => {
     const resize = (e: MouseEvent) => {
@@ -66,7 +112,15 @@ export const VerticalAdjustable = ({ children, contentHeight }: VerticalAdjustab
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+
+      <input
+        type="text"
+        ref={hiddenInputRef}
+        style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
+      />
+
       {children}
+      
       <div
         className={`absolute bottom-1 right-1 p-1 -rotate-90 cursor-ns-resize transition-all 
           ${isResizing || isHovered ? "text-slate-400" : "opacity-0"}

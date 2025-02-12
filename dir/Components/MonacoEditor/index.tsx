@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Editor, { Monaco } from "@monaco-editor/react";
+import Editor from "@monaco-editor/react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
@@ -97,18 +97,36 @@ const MonacoEditor = () => {
     navigator.clipboard.writeText(code);
   };
 
-  const handleEditorMount = (editor: monacoEditor.editor.IStandaloneCodeEditor , monaco: Monaco) => {
+  const handleEditorMount = (editor: monacoEditor.editor.IStandaloneCodeEditor) => {
     // Initial content height
     const model = editor.getModel();
     if (model) {
-      setContentHeight(model.getLineCount() * editor.getOption(monaco.editor.EditorOption.lineHeight));
+      model.updateOptions(
+        { tabSize: 2 , 
+        insertSpaces: true // Ensures spaces instead of tabs
+        }
+      ); 
     }
+
+    const updateContentHeight = () => {
+      if (!editor) return; // Ensure editor exists
+
+      const newHeight = editor.getContentHeight(); // This considers folded sections
+      setContentHeight(newHeight);
+      console.log("Updated content height:", newHeight);
+    };
+
+
+
     // Listen for content changes & update height
     editor.onDidChangeModelContent(() => {
-      const model = editor.getModel();
-      if (model) {
-        setContentHeight(model.getLineCount() * editor.getOption(monaco.editor.EditorOption.lineHeight));
-      }
+      updateContentHeight();
+    });
+
+    // Listen for folding/unfolding changes & update height
+    editor.onDidChangeModelDecorations(() => {
+      updateContentHeight();
+      console.log("Model decorations changed:");
     });
   };
 
@@ -120,11 +138,11 @@ const MonacoEditor = () => {
   return (
     <div className='for-viewport w-full max-w-[800px] justify-center'>
 
-        <div className="flex flex-col w-full h-full border rounded-lg shadow-md">
+      <div className="flex flex-col w-full h-full border rounded-lg shadow-md">
         {/* Header */}
-        <div className="flex items-center justify-between p-3 border-b bg-gray-100">
+        <div className="flex items-center justify-between p-2 border-b bg-gray-50 ">
             <Select onValueChange={(value) => handleLanguageChange(value)} value={language}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="flex items-center justify-between w-28 h-8 text-xs px-2 py-1 border rounded-md shadow-sm  focus:ring-0 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">
                 <SelectValue placeholder="Select Language" />
             </SelectTrigger>
             <SelectContent>
@@ -135,8 +153,8 @@ const MonacoEditor = () => {
                 <SelectItem value="css">CSS</SelectItem>
             </SelectContent>
             </Select>
-            <Button onClick={handleCopy} variant="outline" className="flex items-center gap-2">
-            <Copy size={16} /> Copy
+            <Button onClick={handleCopy} variant="outline" className="flex items-center gap-1 h-8 text-xs px-2 py-1">
+              <Copy size={12} /> Copy
             </Button>
         </div>
 
@@ -149,13 +167,14 @@ const MonacoEditor = () => {
             value={code}
             onChange={(value: string | undefined)=> setCode(value || "")}
             onMount={handleEditorMount}
-            theme="vs-dark"
+            theme= "vs-dark"
             options={{
               minimap: { enabled: false }, // Disable minimap
               overviewRulerLanes: 0, // Hide decorationsOverviewRuler
               scrollBeyondLastLine: false, // Prevent extra space below content
               scrollBeyondLastColumn: 0, // Prevents scrolling beyond the last character
               tabSize: 2,
+              fontFamily: "Fira Code, monospace", 
               scrollbar: {                
                 verticalScrollbarSize: 8,
                 horizontalScrollbarSize: 8,                
@@ -168,7 +187,7 @@ const MonacoEditor = () => {
 
         
        
-        </div>
+      </div>
 
     </div>
   );
