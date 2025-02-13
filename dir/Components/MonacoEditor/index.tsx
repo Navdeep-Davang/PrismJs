@@ -5,88 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
 import { VerticalAdjustable } from "./VerticalAdjustable";
 import * as monacoEditor from 'monaco-editor';
+import codeSnippetsData from "@/dir/data/codeSnippets.json";
 
-const codeSnippets: Record<string, string> = {
-  javascript: `function greet(name) {
-      return \`Hello, \${name}!\`;
-  }
-
-  console.log(greet("Bob"));`,
-
-  typescript: `import { useRef, useState } from "react";
-  import Editor, { Monaco } from "@monaco-editor/react";
-
-  const MyEditor = () => {
-    const editorRef = useRef<any>(null);
-    const [contentHeight, setContentHeight] = useState(0);
-
-    const handleEditorMount = (editor: any, monaco: Monaco) => {
-      editorRef.current = editor;
-
-      // Initial content height
-      setContentHeight(editor.getContentHeight());
-
-      // Listen for content changes & update height
-      editor.onDidContentSizeChange(() => {
-        setContentHeight(editor.getContentHeight());
-      });
-    };
-
-    return (
-      <div>
-        <div className="mb-2 text-gray-500">Content Height: {contentHeight}px</div>
-        <Editor
-          height="100%"
-          width="100%"
-          language="javascript"
-          defaultValue="// Type something..."
-          onMount={handleEditorMount}
-          options={{
-            minimap: { enabled: false },
-            wordWrap: "off",
-            scrollbar: { verticalScrollbarSize: 8 },
-          }}
-        />
-      </div>
-    );
-  };
-
-  export default MyEditor;
-  `,
-
-  python: `def greet(name: str) -> str:
-      return f"Hello, {name}!"
-
-  print(greet("Charlie"))`,
-
-  html: `<!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Greeting</title>
-  </head>
-  <body>
-      <button onclick="alert('Hello, World!')">Click Me</button>
-  </body>
-  </html>`,
-
-  css: `button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  button:hover {
-      background-color: #0056b3;
-  }`,
-};
-
-
-
+const codeSnippets: Record<string, string> = codeSnippetsData;
 
 const MonacoEditor = () => {
   const [language, setLanguage] = useState("javascript");
@@ -142,16 +63,27 @@ const MonacoEditor = () => {
         {/* Header */}
         <div className="flex items-center justify-between p-2 border-b bg-gray-50 ">
             <Select onValueChange={(value) => handleLanguageChange(value)} value={language}>
-            <SelectTrigger className="flex items-center justify-between w-28 h-8 text-xs px-2 py-1 border rounded-md shadow-sm  focus:ring-0 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">
-                <SelectValue placeholder="Select Language" />
-            </SelectTrigger>
-            <SelectContent>
+              <SelectTrigger className="flex items-center justify-between w-28 h-8 text-xs px-2 py-1 border rounded-md shadow-sm  focus:ring-0 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <SelectValue placeholder="Select Language" />
+              </SelectTrigger>
+              <SelectContent>
                 <SelectItem value="javascript">JavaScript</SelectItem>
                 <SelectItem value="typescript">TypeScript</SelectItem>
                 <SelectItem value="python">Python</SelectItem>
+                <SelectItem value="java">Java</SelectItem>
+                <SelectItem value="c">C</SelectItem>
+                <SelectItem value="cpp">C++</SelectItem>
+                <SelectItem value="csharp">C#</SelectItem>
+                <SelectItem value="php">PHP</SelectItem>
+                <SelectItem value="go">Go</SelectItem>
+                <SelectItem value="rust">Rust</SelectItem>
+                <SelectItem value="ruby">Ruby</SelectItem>
+                <SelectItem value="swift">Swift</SelectItem>
                 <SelectItem value="html">HTML</SelectItem>
                 <SelectItem value="css">CSS</SelectItem>
-            </SelectContent>
+                <SelectItem value="json">JSON</SelectItem>
+                <SelectItem value="markdown">Markdown</SelectItem>
+              </SelectContent>
             </Select>
             <Button onClick={handleCopy} variant="outline" className="flex items-center gap-1 h-8 text-xs px-2 py-1">
               <Copy size={12} /> Copy

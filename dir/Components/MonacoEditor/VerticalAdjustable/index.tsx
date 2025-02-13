@@ -43,30 +43,30 @@ export const VerticalAdjustable = ({ children, contentHeight}: VerticalAdjustabl
       const adjustedHeight = contentHeight + 40;
 
       setHeight((prevHeight) => {
-
-        if (prevHeight > adjustedHeight && adjustedHeight < DEFAULT_LOWER_LIMIT ) {
-          if (prevHeight <= upperLimit && prevHeight >= lowerLimit) {
-            return prevHeight;
-          } else {
-            return upperLimit;
-          };
+        // When content height is large (upper limit case)
+        if (adjustedHeight >= DEFAULT_UPPER_LIMIT) {
+          if (prevHeight > adjustedHeight) {
+            return upperLimit; // Ensures no dead space
+          }
+          return prevHeight < lowerLimit ? lowerLimit : prevHeight;
         }
-
-        if (prevHeight < adjustedHeight &&  adjustedHeight >= DEFAULT_LOWER_LIMIT ) {
-          if (prevHeight <= upperLimit && prevHeight >= lowerLimit) {
-            return prevHeight;
-          } else {
-            return lowerLimit;
+  
+        // When content height is small (lower limit case)
+        if (adjustedHeight < DEFAULT_LOWER_LIMIT) {
+          if (prevHeight < adjustedHeight) {
+            return prevHeight < lowerLimit ? upperLimit : prevHeight;
+          }
+          if (prevHeight > adjustedHeight) {
+            return prevHeight > upperLimit ? upperLimit : prevHeight;
           }
         }
-
-        if (prevHeight < adjustedHeight && prevHeight < lowerLimit) {
-          // If prevHeight is less than adjustedHeight, check new limits
-          return prevHeight;
+  
+        // Normal case (within bounds)
+        if (prevHeight > adjustedHeight) {
+          return upperLimit; // Ensures shrinking contracts space
         }
-
-
-        return prevHeight;
+  
+        return prevHeight;     
       });
     }
   }, [contentHeight, lowerLimit, upperLimit]);

@@ -1,0 +1,34 @@
+{
+    "javascript": "function greet(name) {\n    return `Hello, ${name}!`;\n}\n\nfunction add(a, b) {\n    return a + b;\n}\n\nfunction factorial(n) {\n    if (n <= 1) return 1;\n    return n * factorial(n - 1);\n}\n\nconsole.log(greet(\"Alice\"));\nconsole.log(\"Sum:\", add(5, 10));\nconsole.log(\"Factorial of 5:\", factorial(5));",
+    
+    "typescript": "type User = {\n  name: string;\n  age: number;\n};\n\nfunction greet(user: User): string {\n  return `Hello, ${user.name}, you are ${user.age} years old.`;\n}\n\nconst user: User = { name: \"Charlie\", age: 30 };\nconsole.log(greet(user));\n\nconst square = (num: number): number => num * num;\nconsole.log(\"Square of 4:\", square(4));",
+    
+    "python": "def greet(name: str) -> str:\n    return f\"Hello, {name}!\"\n\ndef fibonacci(n: int) -> list:\n    seq = [0, 1]\n    for _ in range(n - 2):\n        seq.append(seq[-1] + seq[-2])\n    return seq\n\nprint(greet(\"Charlie\"))\nprint(\"Fibonacci sequence:\", fibonacci(10))\n\n# Simple class example\nclass Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n    def introduce(self):\n        return f\"My name is {self.name} and I am {self.age} years old.\"\n\np = Person(\"Alice\", 25)\nprint(p.introduce())",
+    
+    "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Simple Page</title>\n</head>\n<body>\n    <h1>Welcome to My Website</h1>\n    <p>This is a simple HTML page.</p>\n    <button onclick=\"alert('Hello, World!')\">Click Me</button>\n    <ul>\n        <li>Item 1</li>\n        <li>Item 2</li>\n    </ul>\n</body>\n</html>",
+    
+    "css": "body {\n    font-family: Arial, sans-serif;\n    background-color: #f4f4f4;\n    color: #333;\n}\n\nbutton {\n    background-color: #007bff;\n    color: white;\n    padding: 10px 20px;\n    border: none;\n    border-radius: 5px;\n    cursor: pointer;\n}\n\nbutton:hover {\n    background-color: #0056b3;\n}",
+    
+    "json": "{\n  \"name\": \"John Doe\",\n  \"age\": 30,\n  \"skills\": [\"JavaScript\", \"Python\", \"Go\"],\n  \"address\": {\n    \"city\": \"New York\",\n    \"country\": \"USA\"\n  }\n}",
+    
+    "markdown": "# Hello, World!\n\nThis is a sample **Markdown** document.\n\n## Features\n- Simple bullet points\n- Code blocks\n- Headings\n\n```javascript\nconsole.log(\"Hello, Markdown!\");\n```",
+    
+    "java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, Java!\");\n        for (int i = 1; i <= 5; i++) {\n            System.out.println(\"Number: \" + i);\n        }\n    }\n}",
+    
+    "c": "#include <stdio.h>\n\nvoid printNumbers(int n) {\n    for (int i = 1; i <= n; i++) {\n        printf(\"%d \", i);\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    printf(\"Hello, C!\\n\");\n    printNumbers(5);\n    return 0;\n}",
+    
+    "cpp": "#include <iostream>\nusing namespace std;\n\nvoid printMessage() {\n    cout << \"C++ is fun!\" << endl;\n}\n\nint main() {\n    cout << \"Hello, C++!\" << endl;\n    printMessage();\n    return 0;\n}",
+    
+    "csharp": "using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(\"Hello, C#!\");\n        for (int i = 0; i < 5; i++) {\n            Console.WriteLine(\"Iteration: \" + i);\n        }\n    }\n}",
+    
+    "php": "<?php\n  function greet($name) {\n      return \"Hello, \" . $name . \"!\";\n  }\n\n  echo greet(\"Alice\");\n?>",
+    
+    "go": "package main\n\nimport \"fmt\"\n\nfunc fibonacci(n int) []int {\n    seq := []int{0, 1}\n    for i := 2; i < n; i++ {\n        seq = append(seq, seq[i-1]+seq[i-2])\n    }\n    return seq\n}\n\nfunc main() {\n    fmt.Println(\"Hello, Go!\")\n    fmt.Println(\"Fibonacci sequence:\", fibonacci(10))\n}",
+    
+    "rust": "fn factorial(n: u32) -> u32 {\n    if n == 0 { return 1; }\n    n * factorial(n - 1)\n}\n\nfn main() {\n    println!(\"Hello, Rust!\");\n    println!(\"Factorial of 5: {}\", factorial(5));\n}",
+    
+    "ruby": "def greet(name)\n  \"Hello, #{name}!\"\nend\n\nputs greet(\"Ruby Programmer\")\n\ndef factorial(n)\n  (1..n).inject(:*) || 1\nend\n\nputs \"Factorial of 5: #{factorial(5)}\"",
+    
+    "swift": "import Foundation\n\nfunc greet(name: String) -> String {\n    return \"Hello, \\(name)!\"\n}\n\nprint(greet(name: \"Swift Developer\"))\n\nfunc factorial(_ n: Int) -> Int {\n    return n == 0 ? 1 : n * factorial(n - 1)\n}\n\nprint(\"Factorial of 5:\", factorial(5))"
+  }
+  
